@@ -1,0 +1,65 @@
+{
+  "id": "summit-roofing",
+  "name": "Summit Roofing Co.",
+  "industry": "roofing contractor",
+  "timezone": "America/Denver",
+  "address": "88 Industrial Way, Lakewood",
+  "website": "summitroofing.example",
+  "agent": {
+    "name": "Max",
+    "voice": { "provider": "vapi", "voiceId": "Elliot" },
+    "greeting": "Summit Roofing, this is Max, an AI assistant for the team. Are you calling about a repair, a replacement, or storm damage?",
+    "personality": "friendly, direct and practical, like an experienced office manager at a trades company"
+  },
+  "hours": {
+    "mon": { "open": "07:00", "close": "18:00" },
+    "tue": { "open": "07:00", "close": "18:00" },
+    "wed": { "open": "07:00", "close": "18:00" },
+    "thu": { "open": "07:00", "close": "18:00" },
+    "fri": { "open": "07:00", "close": "18:00" },
+    "sat": { "open": "08:00", "close": "12:00" },
+    "sun": null
+  },
+  "faqs": [
+    { "q": "Are estimates free?", "a": "Yes. Inspections and written estimates are free, and we send photos of anything we find." },
+    { "q": "Do you work with insurance claims?", "a": "Yes. We document storm and hail damage for your claim and can meet your adjuster on site." },
+    { "q": "What areas do you serve?", "a": "Denver metro: Lakewood, Golden, Arvada, Wheat Ridge, Littleton and Englewood." },
+    { "q": "Are you licensed and insured?", "a": "Yes, fully licensed and insured, and every replacement comes with a 10 year workmanship warranty." },
+    { "q": "How long does a replacement take?", "a": "Most homes take one to two days once materials arrive." },
+    { "q": "Do you offer financing?", "a": "Yes, financing is available on approved credit for replacements over 5,000 dollars." }
+  ],
+  "services": [
+    { "id": "inspection", "name": "Free roof inspection and estimate", "durationMin": 60 },
+    { "id": "storm-damage", "name": "Storm or hail damage assessment", "durationMin": 60 },
+    { "id": "repair", "name": "Leak or repair visit", "durationMin": 60 }
+  ],
+  "qualification": {
+    "questions": [
+      { "field": "zip", "ask": "What's the ZIP code of the property?", "required": true },
+      { "field": "owner", "ask": "Do you own the property? (yes or no)", "required": true },
+      { "field": "property_type", "ask": "Is it a house, a townhome, or a commercial building? (residential or commercial)", "required": true },
+      { "field": "urgency", "ask": "Is anything leaking right now? (active-leak, soon, planning)", "required": true }
+    ],
+    "rules": [
+      { "field": "zip", "op": "startsWithAny", "value": ["800", "801", "804"], "failReason": "That ZIP code is outside our service area." },
+      { "field": "owner", "op": "equals", "value": "yes", "failReason": "We need the property owner to approve an inspection; we're happy to talk with them directly." },
+      { "field": "property_type", "op": "equals", "value": "residential", "failReason": "We only do residential roofs; commercial jobs go to a partner company." }
+    ]
+  },
+  "booking": {
+    "slotMinutes": 60,
+    "leadTimeHours": 4,
+    "maxDaysAhead": 10,
+    "bookingLink": "https://summitroofing.example/inspection",
+    "googleCalendarId": "primary"
+  },
+  "transfer": {
+    "label": "the project manager on call",
+    "number": "+15550100202",
+    "when": ["the caller asks for a person", "an active leak with water coming inside right now", "an existing job or warranty claim", "you could not understand the request after one clarifying question"]
+  },
+  "outbound": {
+    "purpose": "call back homeowners who requested a free roof inspection and qualify them",
+    "firstMessage": "Hi, is this {{leadName}}? This is Max, an AI assistant calling for Summit Roofing. You asked about {{leadInterest}}, so I'm calling to get that set up. Do you have two minutes?"
+  }
+}

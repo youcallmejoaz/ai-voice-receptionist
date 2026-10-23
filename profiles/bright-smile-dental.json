@@ -1,0 +1,142 @@
+{
+  "id": "bright-smile-dental",
+  "name": "Bright Smile Dental",
+  "industry": "dental clinic",
+  "timezone": "America/Chicago",
+  "address": "214 Maple Avenue, Suite 3, Springfield",
+  "website": "brightsmile.example",
+  "agent": {
+    "name": "Ava",
+    "voice": {
+      "provider": "vapi",
+      "voiceId": "Kylie"
+    },
+    "greeting": "Thanks for calling Bright Smile Dental. I'm Ava, the clinic's AI assistant. How can I help you today?",
+    "personality": "warm, calm and reassuring; patients can be nervous about dental visits"
+  },
+  "hours": {
+    "mon": {
+      "open": "08:00",
+      "close": "17:00"
+    },
+    "tue": {
+      "open": "08:00",
+      "close": "17:00"
+    },
+    "wed": {
+      "open": "08:00",
+      "close": "17:00"
+    },
+    "thu": {
+      "open": "10:00",
+      "close": "19:00"
+    },
+    "fri": {
+      "open": "08:00",
+      "close": "14:00"
+    },
+    "sat": null,
+    "sun": null
+  },
+  "faqs": [
+    {
+      "q": "Do you take insurance?",
+      "a": "We're in network with Delta Dental, Cigna, MetLife and Aetna. We also offer a membership plan for patients without insurance."
+    },
+    {
+      "q": "How much is a cleaning without insurance?",
+      "a": "A new patient exam with cleaning and X-rays is 189 dollars. Members pay 29 dollars a month and cleanings are included."
+    },
+    {
+      "q": "Do you see children?",
+      "a": "Yes, we see patients from age three and up."
+    },
+    {
+      "q": "What if I have a dental emergency?",
+      "a": "Call us as early as possible. We keep same-day emergency slots open every weekday morning. If you have severe swelling or trouble breathing, go to the emergency room."
+    },
+    {
+      "q": "Where do I park?",
+      "a": "Free parking is behind the building, entrance on Oak Street."
+    },
+    {
+      "q": "What's your cancellation policy?",
+      "a": "Please give us 24 hours notice. Late cancellations may have a 50 dollar fee."
+    }
+  ],
+  "services": [
+    {
+      "id": "new-patient-exam",
+      "name": "New patient exam and cleaning",
+      "durationMin": 60
+    },
+    {
+      "id": "cleaning",
+      "name": "Routine cleaning",
+      "durationMin": 30
+    },
+    {
+      "id": "emergency",
+      "name": "Emergency visit (tooth pain, broken tooth)",
+      "durationMin": 30
+    },
+    {
+      "id": "whitening-consult",
+      "name": "Whitening consultation",
+      "durationMin": 30
+    }
+  ],
+  "qualification": {
+    "questions": [
+      {
+        "field": "patient_type",
+        "ask": "Have you visited us before, or would you be a new patient? (new or existing)",
+        "required": true
+      },
+      {
+        "field": "age_group",
+        "ask": "Is the appointment for an adult, or for a child? If a child, are they three or older? (adult, child-3-plus, under-3)",
+        "required": true
+      },
+      {
+        "field": "insurance",
+        "ask": "Which dental insurance do you have, if any? (delta, cigna, metlife, aetna, other or none)",
+        "required": true
+      },
+      {
+        "field": "reason",
+        "ask": "What is the main reason for the visit?",
+        "required": true
+      }
+    ],
+    "rules": [
+      {
+        "field": "age_group",
+        "op": "notEquals",
+        "value": "under-3",
+        "failReason": "We see patients from age three; we can refer you to a pediatric dentist."
+      }
+    ]
+  },
+  "booking": {
+    "slotMinutes": 30,
+    "leadTimeHours": 2,
+    "maxDaysAhead": 14,
+    "bookingLink": "https://brightsmile.example/book",
+    "googleCalendarId": "primary"
+  },
+  "transfer": {
+    "label": "the front desk",
+    "number": "+15550100101",
+    "when": [
+      "the caller asks for a person",
+      "billing disputes",
+      "a clinical question the FAQs do not answer",
+      "you could not understand the request after one clarifying question"
+    ]
+  },
+  "outbound": {
+    "purpose": "follow up with people who asked for a callback about booking a dental visit",
+    "firstMessage": "Hi, is this {{leadName}}? This is Ava, the AI assistant at Bright Smile Dental. You asked us to call you back about {{leadInterest}}. Is now a good time?"
+  }
+}
