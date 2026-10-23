@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+# runtime data (SQLite, private recordings)
+data/
+# raw, untrimmed recordings; only final clips are committed (via LFS)
+clips/raw/
+clips/tmp/
+*.webm
+*.wav
+.DS_Store
