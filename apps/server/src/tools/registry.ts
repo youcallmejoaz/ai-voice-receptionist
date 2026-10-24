@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { logEvent } from "../db/index.js";
+import type { BusinessProfile } from "../profiles/schema.js";
 import type { ToolContext, ToolResult } from "./context.js";
 import { createLead, createLeadArgs, doNotCallArgs, markDoNotCall, transferArgs, transferToHuman } from "./leads.js";
 import {
@@ -62,10 +63,33 @@ export function isToolName(name: string): name is ToolName {
   return Object.hasOwn(TOOLS, name);
 }
 
-/** JSON Schema for a tool's arguments, in the shape LLM function-calling expects. */
-export function toolParameters(name: ToolName): Record<string, unknown> {
-  const schema = z.toJSONSchema(TOOLS[name].args, { target: "draft-7" }) as Record<string, unknown>;
-  delete schema.$schema;
+const SCHEMA_KEYS = new Set(["type", "items", "properties", "description", "pattern", "format", "required", "enum", "title"]);
+
+/** Keep only the JSON Schema keywords Vapi's function parameters accept. */
+function sanitize(node: unknown): unknown {
+  if (Array.isArray(node)) return node.map(sanitize);
+  if (!node || typeof node !== "object") return node;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(node)) {
+    if (!SCHEMA_KEYS.has(k)) continue;
+    out[k] = k === "properties" ? Object.fromEntries(Object.entries(v as object).map(([pk, pv]) => [pk, sanitize(pv)])) : sanitize(v);
+  }
+  return out;
+}
+
+/**
+ * JSON Schema for a tool's arguments, in the subset LLM function-calling (and Vapi) accepts.
+ * create_lead's answers are spelled out per business, so the model sees the exact field names.
+ */
+export function toolParameters(name: ToolName, profile?: BusinessProfile): Record<string, unknown> {
+  const schema = sanitize(z.toJSONSchema(TOOLS[name].args, { target: "draft-7" })) as Record<string, any>;
+  if (name === "create_lead" && profile) {
+    schema.properties.answers = {
+      type: "object",
+      description: "Answers to the qualification questions, using the suggested values where given",
+      properties: Object.fromEntries(profile.qualification.questions.map((q) => [q.field, { type: "string", description: q.ask }])),
+    };
+  }
   return schema;
 }
 

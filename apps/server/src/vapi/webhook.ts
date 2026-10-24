@@ -17,12 +17,16 @@ interface Resolved {
  * Map a Vapi call to our call record. Web and outbound calls carry our sessionId in
  * variableValues; inbound phone calls are matched by assistant id and created on first sight.
  */
-export function resolveCall(app: AppContext, vc: VapiCallInfo | null | undefined): Resolved | null {
+export function resolveCall(
+  app: AppContext,
+  vc: VapiCallInfo | null | undefined,
+  artifactVars?: Record<string, unknown> | null,
+): Resolved | null {
   if (!vc) return null;
   const { db } = app;
   let call = getCallByVapiId(db, vc.id);
   if (!call) {
-    const sessionId = vc.assistantOverrides?.variableValues?.sessionId;
+    const sessionId = vc.assistantOverrides?.variableValues?.sessionId ?? artifactVars?.sessionId;
     if (typeof sessionId === "string") {
       call = getCallBySession(db, sessionId);
       if (call) {
@@ -69,7 +73,7 @@ export async function handleServerMessage(app: AppContext, body: unknown): Promi
     return {};
   }
   const msg = parsed.data.message;
-  const resolved = resolveCall(app, msg.call);
+  const resolved = resolveCall(app, msg.call, msg.artifact?.variableValues);
 
   switch (msg.type) {
     case "tool-calls": {

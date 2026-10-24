@@ -44,6 +44,7 @@ export const VapiServerMessage = z.object({
           messages: z.array(ArtifactMessage).optional(),
           transcript: z.string().optional(),
           recordingUrl: z.string().nullish(),
+          variableValues: z.record(z.string(), z.unknown()).nullish(),
           recording: z.object({ mono: z.object({ combinedUrl: z.string().nullish() }).passthrough().nullish() }).passthrough().nullish(),
         })
         .passthrough()

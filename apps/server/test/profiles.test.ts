@@ -72,16 +72,17 @@ describe("assistant built from a profile", () => {
 
   it("exposes every tool, pointing at our webhook with the secret header", () => {
     const a = buildAssistant(load()[1], opts);
-    const names = a.model.tools.map((t: any) => t.function?.name);
-    expect(names).toEqual(Object.keys(TOOLS));
-    for (const t of a.model.tools as any[]) expect(t.server).toEqual({ url: opts.webhookUrl, headers: { "x-vapi-secret": "s3cret" } });
-    expect((a.model.tools[0] as any).function.parameters.type).toBe("object");
+    const fns = (a.model!.tools as any[]).filter((t) => t.type === "function");
+    expect(fns.map((t) => t.function.name)).toEqual(Object.keys(TOOLS));
+    expect(a.model!.tools!.some((t: any) => t.type === "endCall")).toBe(true);
+    for (const t of fns) expect(t.server).toEqual({ url: opts.webhookUrl, headers: { "x-vapi-secret": "s3cret" } });
+    expect((a.model!.tools![0] as any).function.parameters.type).toBe("object");
   });
 
   it("only adds the live transferCall tool when telephony is configured", () => {
     const p = load()[1];
-    expect(buildAssistant(p, opts).model.tools.some((t: any) => t.type === "transferCall")).toBe(false);
-    const live = buildAssistant(p, { ...opts, telephonyEnabled: true }).model.tools.find((t: any) => t.type === "transferCall") as any;
+    expect(buildAssistant(p, opts).model!.tools!.some((t: any) => t.type === "transferCall")).toBe(false);
+    const live = buildAssistant(p, { ...opts, telephonyEnabled: true }).model!.tools!.find((t: any) => t.type === "transferCall") as any;
     expect(live.destinations[0].number).toBe(p.transfer.number);
   });
 
