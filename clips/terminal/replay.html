@@ -1,0 +1,73 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Terminal replay</title>
+<style>
+html, body { margin: 0; width: 1920px; height: 1080px; background: #0b0f17; overflow: hidden; }
+.win { position: absolute; inset: 70px 110px; background: #111827; border-radius: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.5); overflow: hidden; border: 1px solid #1f2937; }
+.bar { height: 54px; background: #1a2231; display: flex; align-items: center; gap: 12px; padding: 0 22px; }
+.bar i { width: 15px; height: 15px; border-radius: 50%; display: block; }
+.bar span { color: #8b95a7; font: 500 20px "Inter", sans-serif; margin-left: 18px; }
+pre { margin: 0; padding: 34px 44px; color: #e5e7eb; font: 25px/1.55 "DejaVu Sans Mono", ui-monospace, monospace; white-space: pre-wrap; }
+.p { color: #34d399; } .dim { color: #8b95a7; } .ok { color: #34d399; } .hl { color: #fbbf24; } .b { color: #fff; font-weight: 700; } .acc { color: #60a5fa; }
+.cur { display: inline-block; width: 13px; height: 28px; background: #e5e7eb; vertical-align: -5px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+</style></head>
+<body>
+<div class="win"><div class="bar"><i style="background:#f87171"></i><i style="background:#fbbf24"></i><i style="background:#34d399"></i><span>ai-voice-receptionist</span></div><pre id="out"></pre></div>
+<script>
+const SCRIPTS = {
+  C13: [
+    ["type", '<span class="p">❯</span> ', 13, "You are in plan mode. Build a reusable AI voice receptionist for small businesses: answer calls, handle FAQs, qualify the caller, book appointments, transfer to a human, send a call summary to the CRM, and call back leads who opted in, respecting do-not-call lists. One profile per business. Give me a phased plan before any code."],
+    ["pause", 700],
+    ["lines", [
+      "",
+      '<span class="acc">●</span> <span class="b">Plan: AI Voice Receptionist</span>',
+      '  <span class="hl">Platform</span>  Vapi: assistant generated per business profile, browser calls, tool webhooks',
+      '  <span class="hl">Phase 1</span>   Tool backend: check_availability · book_appointment · create_lead',
+      '            transfer_to_human · mark_do_not_call · callback fallback',
+      '  <span class="hl">Phase 2</span>   Vapi sync · Claude call summaries · private recordings',
+      '  <span class="hl">Phase 3</span>   Dashboard: profiles, live call, call log, calendar, CRM',
+      '  <span class="hl">Phase 4</span>   Outbound: consent column, do-not-call list, quiet hours',
+      '  <span class="hl">Phase 5</span>   Render deploy · live acceptance calls · demo clips',
+      '  <span class="hl">Tests</span>     tool endpoints · consent checks · profile loading',
+      "",
+      '<span class="dim">  Waiting for your approval before building.</span>',
+    ]],
+  ],
+  C14: [
+    ["type", '<span class="p">❯</span> ', 20, "Add a second business profile: Summit Roofing in Denver. Free inspections, residential only, service-area ZIPs starting 800, 801 or 804."],
+    ["pause", 600],
+    ["lines", [
+      "",
+      '<span class="acc">●</span> <span class="b">Write</span> profiles/summit-roofing.json <span class="dim">(hours, FAQs, services, qualification rules)</span>',
+      '<span class="acc">●</span> <span class="b">Bash</span> npm test',
+      '  <span class="ok">✓</span> profiles.test.ts   loads both sample businesses',
+      '  <span class="ok">✓</span> tools.test.ts      create_lead › qualifies a homeowner in the service area',
+      '  <span class="ok">✓</span> tools.test.ts      create_lead › marks out-of-area renters as not a fit',
+      '  <span class="ok">Tests  63 passed</span>',
+      "",
+      '<span class="acc">●</span> Summit Roofing Co. is live in the dashboard switcher.',
+      '  <span class="b">No code changed</span>: one profile file, same tools and safeguards.',
+    ]],
+  ],
+};
+const clip = new URLSearchParams(location.search).get("clip") || "C13";
+const out = document.getElementById("out");
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+(async () => {
+  await sleep(500);
+  for (const step of SCRIPTS[clip]) {
+    if (step[0] === "pause") await sleep(step[1]);
+    if (step[0] === "type") {
+      out.innerHTML = step[1] + '<span id="t"></span><span class="cur"></span>';
+      const t = document.getElementById("t");
+      const speed = step[2]; // ms per character, keeps each replay inside its clip length
+      for (const ch of step[3]) { t.textContent += ch; await sleep(speed + Math.random() * speed * 0.8); }
+      await sleep(350);
+      out.querySelector(".cur").remove();
+    }
+    if (step[0] === "lines") for (const l of step[1]) { out.innerHTML += "\n" + l; await sleep(l ? 260 : 120); }
+  }
+  document.title = "done";
+})();
+</script>
+</body></html>

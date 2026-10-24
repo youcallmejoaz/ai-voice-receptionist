@@ -3,14 +3,23 @@
   "private": true,
   "version": "0.1.0",
   "description": "Reusable AI voice receptionist: inbound booking, qualification, human transfer and consent-gated outbound follow-up.",
-  "workspaces": ["apps/server", "apps/dashboard"],
-  "engines": { "node": ">=22" },
+  "workspaces": [
+    "apps/server",
+    "apps/dashboard"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "npm run dev -w apps/server",
     "build": "npm run build -w apps/dashboard && npm run build -w apps/server",
     "start": "npm run start -w apps/server",
     "test": "npm test -w apps/server",
     "typecheck": "npm run typecheck -w apps/server && npm run typecheck -w apps/dashboard",
-    "seed": "npm run seed -w apps/server"
+    "seed": "npm run seed -w apps/server",
+    "clips": "node clips/record.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
   }
 }

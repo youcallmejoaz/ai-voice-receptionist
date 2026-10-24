@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><title>C01 Before</title><link rel="stylesheet" href="card.css">
+<style>
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 90px; }
+.stat { border: 2px solid var(--line); border-radius: 28px; padding: 46px 44px; }
+.num { font-size: 140px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.lbl { font-size: 34px; margin-top: 18px; font-weight: 600; }
+.desc { font-size: 26px; color: var(--muted); margin-top: 8px; }
+.red .num { color: var(--red); } .amber .num { color: var(--amber); }
+.strike { position: relative; }
+.strike::after { content: ""; position: absolute; left: -6px; right: -6px; top: 55%; height: 8px; background: var(--red); transform: scaleX(0); transform-origin: left; animation: strike 0.6s 5.2s ease-out forwards; }
+@keyframes strike { to { transform: scaleX(1); } }
+</style></head><body>
+<div class="card">
+  <div class="kicker in">The problem</div>
+  <h1 class="in" style="animation-delay:.3s">Calls after 5pm go <span class="strike">nowhere</span></h1>
+  <div class="grid">
+    <div class="stat red in" style="animation-delay:1.4s"><div class="num" data-count="14">0</div><div class="lbl">missed calls</div><div class="desc">rang out after hours</div></div>
+    <div class="stat amber in" style="animation-delay:2.4s"><div class="num" data-count="9">0</div><div class="lbl">voicemails</div><div class="desc">waiting until Monday</div></div>
+    <div class="stat red in" style="animation-delay:3.4s"><div class="num" data-count="6">0</div><div class="lbl">bookings lost</div><div class="desc">they called the next result</div></div>
+  </div>
+</div>
+<div class="note in" style="animation-delay:4s">Illustrative week for a small clinic</div>
+<script>
+document.querySelectorAll("[data-count]").forEach((el, i) => {
+  const target = +el.dataset.count, start = 1600 + i * 1000;
+  setTimeout(() => { let n = 0; const t = setInterval(() => { el.textContent = ++n; if (n >= target) clearInterval(t); }, 700 / target); }, start);
+});
+</script></body></html>

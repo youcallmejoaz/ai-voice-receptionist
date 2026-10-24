@@ -1,0 +1,22 @@
+# Scripted caller lines for the call clips. Format: CLIP_NN|text
+# Each line answers several questions at once so the conversation works even if the agent asks
+# in a different order. Replace the generated WAVs with real recordings for a more natural demo.
+C04_01|Hi, I would like to book a routine cleaning. I am a new patient, an adult, and I have Delta Dental.
+C04_02|Thursday afternoon would be great.
+C04_03|The first time works for me.
+C04_04|Jordan Avery. Three one two, five five five, zero one four four.
+C04_05|Yes, that is right. That is everything, thank you.
+C07_01|Hi there. What areas do you cover?
+C07_02|Sorry, actually, do you offer financing?
+C07_03|Great, that is all I needed. Thanks.
+C08_01|Hi, I have a question about a bill from my last visit.
+C08_02|Can I just talk to a real person, please?
+C08_03|Okay, thank you.
+C10_01|Yes, this is Dana. Now is fine.
+C10_02|The zip is eight zero four zero one. I own the house, it is residential, and nothing is leaking right now.
+C10_03|Tuesday morning works. The first time is fine.
+C10_04|Yes, that is my number. Thanks, bye.
+C11_01|Hi, I need someone to look at hail damage on my roof. Zip eight zero four zero one, I own the house, it is residential, no leaks.
+C11_02|Tomorrow morning if possible.
+C11_03|Sure, please call me back. Alex Morgan, seven two zero, five five five, zero one nine nine.
+C11_04|Morning is best. Thanks, that is all.

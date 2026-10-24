@@ -167,5 +167,9 @@ describe("dashboard API auth", () => {
     const bad = await t.http.patch("/api/profiles/bright-smile-dental").set("Cookie", cookie).send({ timezone: "Nowhere/Land" });
     expect(bad.status).toBe(400);
     expect(bad.body.issues.join(" ")).toMatch(/timezone/);
+
+    await t.http.post("/api/demo/reset").set("Cookie", cookie).send({ profileId: "bright-smile-dental" });
+    const restored = await t.http.get("/api/profiles/bright-smile-dental").set("Cookie", cookie);
+    expect(restored.body.profile.faqs.length).toBeGreaterThan(1); // back to the file's FAQs
   });
 });

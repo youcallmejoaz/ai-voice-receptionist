@@ -8,7 +8,8 @@ import { getLead, listLeads } from "../crm/leads.js";
 import { listSuppression } from "../crm/suppression.js";
 import { importLeads, importSuppression, listJobs, runOutbound, startSandboxCall } from "../outbound/dialer.js";
 import { ProfileValidationError } from "../profiles/loader.js";
-import { getProfile, listProfiles, setCalendarOutage, updateProfile } from "../profiles/store.js";
+import { loadProfilesFromDir } from "../profiles/loader.js";
+import { getProfile, listProfiles, seedProfiles, setCalendarOutage, updateProfile } from "../profiles/store.js";
 import { addDays, localDate, zonedToUtc } from "../util/time.js";
 import { assistantFor, syncAssistant } from "./assistant-sync.js";
 
@@ -245,7 +246,7 @@ export function adminRoutes(app: AppContext) {
   r.get("/suppression", (_req, res) => res.json(listSuppression(db)));
   r.post("/suppression/import", csvBody, (req, res) => res.json(importSuppression(app, String(req.body ?? ""))));
 
-  // ------------------------------------------------------------ demo reset
+  // ------------------------------------------------------------ demo reset (clears this profile's calls, leads and edits)
   r.post("/demo/reset", (req, res) => {
     const id = profileId(req);
     const s = getProfile(db, id);
@@ -259,6 +260,9 @@ export function adminRoutes(app: AppContext) {
       db.prepare("DELETE FROM slots WHERE profile_id = ?").run(id);
     })();
     setCalendarOutage(db, id, false);
+    // restore the profile from its config file, discarding dashboard edits
+    const fromFile = loadProfilesFromDir(cfg.profilesDir).find((p) => p.id === id);
+    if (fromFile) seedProfiles(db, [fromFile], true);
     app.mockCalendar.ensureSlots(s.profile, app.now());
     res.json({ ok: true });
   });

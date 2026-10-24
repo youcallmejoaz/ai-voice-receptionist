@@ -1,0 +1,33 @@
+<!doctype html><html><head><meta charset="utf-8"><title>C16 Cost estimate</title><link rel="stylesheet" href="card.css">
+<style>
+.wrap { display: grid; grid-template-columns: 1.25fr 1fr; gap: 80px; margin-top: 70px; align-items: start; }
+table { width: 100%; border-collapse: collapse; font-size: 32px; }
+td { padding: 20px 0; border-bottom: 2px solid var(--line); }
+td:last-child { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+tr.total td { border-bottom: 0; font-size: 40px; font-weight: 800; padding-top: 28px; }
+.big { border: 3px solid var(--green); background: var(--green-bg); border-radius: 32px; padding: 50px; }
+.big .k { font-size: 30px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; }
+.big .v { font-size: 92px; white-space: nowrap; font-weight: 800; letter-spacing: -0.04em; margin-top: 10px; }
+.big .s { font-size: 30px; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+</style></head><body>
+<div class="card">
+  <div class="kicker in">Business value · <span class="tag amber">Estimate</span></div>
+  <h1 class="in" style="animation-delay:.3s">What 100 calls cost to run</h1>
+  <div class="wrap">
+    <table>
+      <tr class="in" style="animation-delay:1.2s"><td>Voice platform (Vapi)</td><td>$15</td></tr>
+      <tr class="in" style="animation-delay:1.7s"><td>Speech-to-text</td><td>~$3</td></tr>
+      <tr class="in" style="animation-delay:2.2s"><td>AI model + summaries</td><td>~$1</td></tr>
+      <tr class="in" style="animation-delay:2.7s"><td>AI voice</td><td>$6–21</td></tr>
+      <tr class="in" style="animation-delay:3.2s"><td>Phone minutes</td><td>~$3–4</td></tr>
+      <tr class="in" style="animation-delay:3.7s"><td>Hosting (monthly)</td><td>~$8</td></tr>
+      <tr class="total in" style="animation-delay:4.4s"><td>Estimated total</td><td>$35–55</td></tr>
+    </table>
+    <div class="big in" style="animation-delay:5.2s">
+      <div class="k">Per call</div>
+      <div class="v">≈ $0.35–0.55</div>
+      <div class="s">Assumes 3-minute calls on public October 2026 pricing. Verify with each provider before quoting.</div>
+    </div>
+  </div>
+</div>
+</body></html>
