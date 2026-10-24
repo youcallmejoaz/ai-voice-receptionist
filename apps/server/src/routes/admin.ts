@@ -200,6 +200,7 @@ export function adminRoutes(app: AppContext) {
     res.json({
       timezone: s.profile.timezone,
       provider: app.calendar.name,
+      now: app.now().toISOString(),
       slots: db
         .prepare("SELECT start_utc AS startUtc, end_utc AS endUtc, booked FROM slots WHERE profile_id = ? AND start_utc >= ? AND start_utc < ? ORDER BY start_utc")
         .all(s.profile.id, from, to),

@@ -29,6 +29,8 @@ export interface AppConfig {
   googleClientSecret: string;
   googleRefreshToken: string;
   crmWebhookUrl: string;
+  /** Pins the server clock (ISO time). Only for recording demos outside business hours. */
+  demoClock: Date | null;
 }
 
 export function loadConfig(): AppConfig {
@@ -37,7 +39,8 @@ export function loadConfig(): AppConfig {
     port: Number(env("PORT", "3000")),
     nodeEnv,
     repoRoot,
-    publicBaseUrl: env("PUBLIC_BASE_URL", "http://localhost:3000").replace(/\/$/, ""),
+    // Render sets RENDER_EXTERNAL_URL automatically
+    publicBaseUrl: env("PUBLIC_BASE_URL", env("RENDER_EXTERNAL_URL", "http://localhost:3000")).replace(/\/$/, ""),
     databasePath: path.resolve(repoRoot, env("DATABASE_PATH", "./data/receptionist.db")),
     recordingsDir: path.resolve(repoRoot, env("RECORDINGS_DIR", "./data/recordings")),
     profilesDir: path.resolve(repoRoot, env("PROFILES_DIR", "./profiles")),
@@ -56,7 +59,9 @@ export function loadConfig(): AppConfig {
     googleClientSecret: env("GOOGLE_CLIENT_SECRET"),
     googleRefreshToken: env("GOOGLE_REFRESH_TOKEN"),
     crmWebhookUrl: env("CRM_WEBHOOK_URL"),
+    demoClock: env("DEMO_CLOCK") ? new Date(env("DEMO_CLOCK")) : null,
   };
+  if (cfg.demoClock && Number.isNaN(cfg.demoClock.getTime())) throw new Error("DEMO_CLOCK must be an ISO date-time");
   if (nodeEnv === "production") {
     const missing = (["adminPassword", "sessionSecret", "vapiWebhookSecret"] as const).filter((k) => !cfg[k]);
     if (missing.length) throw new Error(`Missing required config in production: ${missing.join(", ")}`);

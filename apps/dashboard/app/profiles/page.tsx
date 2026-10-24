@@ -44,7 +44,7 @@ export default function ProfilesPage() {
       setP(r.profile);
       setSynced(r.synced);
     });
-  }, [current]);
+  }, [current?.id]);
 
   if (!p || !current) return <p className="muted">Loading…</p>;
 

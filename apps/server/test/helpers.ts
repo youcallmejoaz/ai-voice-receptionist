@@ -50,6 +50,7 @@ export function testConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     googleClientSecret: "",
     googleRefreshToken: "",
     crmWebhookUrl: "",
+    demoClock: null,
     ...overrides,
   };
 }

@@ -65,6 +65,7 @@ export function listJobs(app: AppContext, profileId: string): OutboundJob[] {
     .map((r) => ({ ...(r as OutboundJob), consent: (r as { consent: number }).consent === 1 }));
 }
 
+/** skipReason doubles as the "deferred until calling hours" note on queued jobs. */
 function setJob(app: AppContext, id: number, status: string, skipReason: string | null = null, callId: number | null = null) {
   app.db
     .prepare(
@@ -94,20 +95,23 @@ export async function runOutbound(app: AppContext, profileId: string) {
   const stored = getProfile(app.db, profileId);
   if (!stored) throw new Error(`Unknown profile ${profileId}`);
   const jobs = listJobs(app, profileId).filter((j) => j.status === "queued");
-  const summary = { checked: jobs.length, skipped: 0, ready: 0, dialled: 0, failed: 0 };
+  const summary = { checked: jobs.length, skipped: 0, deferred: 0, ready: 0, dialled: 0, failed: 0 };
 
   for (const job of jobs) {
     const lead = getLead(app.db, job.leadId)!;
     const gate = checkOutbound(app.db, lead, stored.profile, app.now());
     if (!gate.allowed) {
-      setJob(app, job.id, "skipped", gate.message);
+      // quiet hours only postpone a call; consent and do-not-call problems remove the lead from the run
+      const deferred = gate.reason === "outside_calling_hours";
+      setJob(app, job.id, deferred ? "queued" : "skipped", gate.message);
       logEvent(app.db, {
         profileId,
         kind: "outbound",
-        name: "skipped",
+        name: deferred ? "deferred" : "skipped",
         detail: { jobId: job.id, lead: lead.name, phone: maskPhone(lead.phone), reason: gate.reason, message: gate.message },
       });
-      summary.skipped++;
+      if (deferred) summary.deferred++;
+      else summary.skipped++;
       continue;
     }
     if (!telephonyEnabled(app) || !stored.vapiAssistantId) {
@@ -149,11 +153,12 @@ export function startSandboxCall(app: AppContext, jobId: number) {
   const lead = getLead(app.db, job.lead_id)!;
   const gate = checkOutbound(app.db, lead, stored.profile, app.now());
   if (!gate.allowed) {
-    setJob(app, job.id, "skipped", gate.message);
+    const deferred = gate.reason === "outside_calling_hours";
+    setJob(app, job.id, deferred ? "ready" : "skipped", gate.message);
     logEvent(app.db, {
       profileId: job.profile_id,
       kind: "outbound",
-      name: "skipped",
+      name: deferred ? "deferred" : "skipped",
       detail: { jobId: job.id, lead: lead.name, phone: maskPhone(lead.phone), reason: gate.reason, message: gate.message },
     });
     return { ok: false as const, error: gate.message };

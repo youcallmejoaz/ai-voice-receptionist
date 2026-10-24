@@ -33,6 +33,8 @@ function logLine(e: Ev) {
   switch (e.name) {
     case "skipped":
       return `SKIPPED ${d.lead} (${d.phone}): ${d.message}`;
+    case "deferred":
+      return `WAIT    ${d.lead} (${d.phone}): outside 8am-9pm, stays queued`;
     case "ready":
       return `READY   ${d.lead} (${d.phone}): consent ✓ · not on do-not-call list ✓`;
     case "dialled":
@@ -71,7 +73,7 @@ export default function OutboundPage() {
     setJobs(j);
     setLog(ev.filter((e) => e.kind === "outbound").reverse());
     setDnc(s);
-  }, [current]);
+  }, [current?.id]);
 
   useEffect(() => {
     api("/api/config").then((c) => setPublicKey(c.vapiPublicKey)).catch(() => {});
@@ -129,7 +131,7 @@ export default function OutboundPage() {
           disabled={!jobs.some((j) => j.status === "queued")}
           onClick={async () => {
             const r = await api("/api/outbound/run", { method: "POST", json: { profileId: current.id } });
-            setMessage(`Checked ${r.checked}: ${r.skipped} skipped, ${r.ready + r.dialled} cleared to call`);
+            setMessage(`Checked ${r.checked}: ${r.skipped} skipped, ${r.ready + r.dialled} cleared to call${r.deferred ? `, ${r.deferred} waiting for calling hours` : ""}`);
             load();
           }}
         >
@@ -193,6 +195,8 @@ export default function OutboundPage() {
                   <td>
                     {j.status === "skipped" ? (
                       <span className="skip">Skipped: {j.skipReason}</span>
+                    ) : j.status === "queued" && j.skipReason ? (
+                      <span className="badge amber">Waiting: calling hours</span>
                     ) : j.outcome ? (
                       <OutcomeBadge outcome={j.outcome} />
                     ) : (

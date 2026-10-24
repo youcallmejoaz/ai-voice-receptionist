@@ -1,0 +1,51 @@
+# One Render web service: Express API + Next.js dashboard on the same origin,
+# SQLite and private call recordings on a persistent disk.
+services:
+  - type: web
+    name: ai-voice-receptionist
+    runtime: node
+    plan: starter            # a persistent disk needs a paid instance; free instances lose data on deploy
+    region: oregon
+    buildCommand: npm ci --include=dev && npm run build   # dev deps (tsc, next) are needed to build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: DATABASE_PATH
+        value: /var/data/receptionist.db
+      - key: RECORDINGS_DIR
+        value: /var/data/recordings
+      - key: CALENDAR_PROVIDER
+        value: mock
+      - key: SUMMARY_MODEL
+        value: claude-haiku-5-5
+      - key: VAPI_LLM_PROVIDER
+        value: anthropic
+      - key: VAPI_LLM_MODEL
+        value: claude-haiku-5-5
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: VAPI_WEBHOOK_SECRET
+        generateValue: true
+      # set these in the Render dashboard (never commit them)
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: VAPI_PRIVATE_KEY
+        sync: false
+      - key: VAPI_PUBLIC_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: VAPI_PHONE_NUMBER_ID
+        sync: false
+      - key: CRM_WEBHOOK_URL
+        sync: false

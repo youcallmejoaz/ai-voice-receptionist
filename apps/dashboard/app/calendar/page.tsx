@@ -21,6 +21,7 @@ interface Appt {
 interface CalendarData {
   timezone: string;
   provider: string;
+  now: string;
   slots: Slot[];
   appointments: Appt[];
 }
@@ -35,7 +36,7 @@ export default function CalendarPage() {
     load();
     const t = setInterval(load, 4000);
     return () => clearInterval(t);
-  }, [current]);
+  }, [current?.id]);
 
   if (!data) return <p className="muted">Loading…</p>;
   const tz = data.timezone;
@@ -77,7 +78,7 @@ export default function CalendarPage() {
                       <span>{a.service}</span>
                     </Link>
                   ) : (
-                    <div key={s.startUtc} className={`cal-slot ${s.booked ? "taken" : "open"}`}>
+                    <div key={s.startUtc} className={`cal-slot ${s.startUtc < data.now ? "past" : s.booked ? "taken" : "open"}`}>
                       {time(s.startUtc)}
                     </div>
                   );

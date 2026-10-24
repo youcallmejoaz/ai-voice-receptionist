@@ -120,6 +120,15 @@ describe("running the outbound list", () => {
     expect(listJobs(t.ctx, ROOF).find((j) => j.name === "Marcus Lee")!.status).toBe("skipped");
   });
 
+  it("quiet hours defer leads (still queued) instead of skipping them", async () => {
+    const t = await makeTestApp({ now: new Date("2026-10-27T04:00:00Z") }); // 10pm Denver
+    importSuppression(t.ctx, dncCsv);
+    importLeads(t.ctx, ROOF, leadsCsv);
+    expect(await runOutbound(t.ctx, ROOF)).toMatchObject({ skipped: 6, deferred: 9, ready: 0 });
+    const dana = listJobs(t.ctx, ROOF).find((j) => j.name === "Dana Whitfield")!;
+    expect(dana).toMatchObject({ status: "queued", skipReason: "Outside 8am-9pm calling hours" });
+  });
+
   it("a caller who opts out during a call can never be called again", async () => {
     const t = await makeTestApp();
     t.ctx.db.prepare("UPDATE profiles SET vapi_assistant_id = 'asst_roof' WHERE id = ?").run(ROOF);
