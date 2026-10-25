@@ -52,6 +52,16 @@ marks stay in `clips/raw/` (git-ignored) if a clip needs re-trimming.
 
 ## Proposal cut
 
+**`proposal_cut_interim.mp4`** (63.6 s, H.264 + silent AAC track) is available now, built from
+the clips that exist: C01 → C02 → C13 → C14 → C09 → C15 → C16 (problem, how it works, how I
+built it, consent checks working, safeguards, cost). It has **no live-call footage**, so replace
+it once the call clips are recorded:
+
+```bash
+OUT=proposal_cut_interim.mp4 ./clips/build-proposal.sh C01 C02 C13 C14 C09 C15 C16   # rebuild interim
+./clips/build-proposal.sh                                                           # final: C01 C04 C05 C06 C16
+```
+
 `build-proposal.sh` concatenates C01, C04, C05, C06 and C16, which comes to about 45 s, short
 of the 60–90 s target. Pass extra clip ids to lengthen it, e.g.
 `./build-proposal.sh C01 C02 C04 C05 C06 C15 C16` (~63 s).

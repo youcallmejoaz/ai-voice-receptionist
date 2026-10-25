@@ -3,6 +3,7 @@
 # cut has continuous AAC audio. Default list is the brief's: C01 C04 C05 C06 C16 (~45 s).
 # Add clips to reach 60-90 s, e.g.:  ./build-proposal.sh C01 C02 C04 C05 C06 C15 C16
 set -euo pipefail
+out="${OUT:-proposal_cut.mp4}"   # e.g. OUT=proposal_cut_interim.mp4
 cd "$(dirname "$0")"
 ids=("$@"); [ $# -eq 0 ] && ids=(C01 C04 C05 C06 C16)
 inputs=() filters="" n=0
@@ -22,5 +23,5 @@ done
 concat=""
 for i in $(seq 0 $((n - 1))); do concat+="[v$i][a$i]"; done
 ffmpeg -nostdin -y -loglevel error "${inputs[@]}" -filter_complex "${filters}${concat}concat=n=$n:v=1:a=1[v][a]" \
-  -map "[v]" -map "[a]" -c:v libx264 -preset slow -crf 18 -c:a aac -b:a 160k -movflags +faststart proposal_cut.mp4
-echo "proposal_cut.mp4 $(ffprobe -v error -show_entries format=duration -of csv=p=0 proposal_cut.mp4)s"
+  -map "[v]" -map "[a]" -c:v libx264 -preset slow -crf 18 -c:a aac -b:a 160k -movflags +faststart "$out"
+echo "$out $(ffprobe -v error -show_entries format=duration -of csv=p=0 "$out")s"
